@@ -182,7 +182,7 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
     hosts: {
       byRef: {
         [ref: Ref]: {
-          id: string,
+          id: Id,
           ref: Ref,
           type: "local"|"jupyter",
           selectedKernelRef: Ref,
@@ -212,7 +212,7 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
           channels: rxjs$Subject,
           status: string,
 
-          id: string, // jupyter only
+          id: Id, // jupyter only
 
           spawn: ChildProcess, // local only
           connectionFile: string, // local only
