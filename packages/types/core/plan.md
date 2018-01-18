@@ -50,17 +50,19 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
 
 ## The Proposed Structure
 
-```js
-{
+```flow js
+opaque type Id = string;
+opaque type Ref = string;
+
+type state = {
   // The top level of core state can be considered a notebook, but we formalize
-  // that by nesting it under `notebook`.
+  // that by nesting it under `notebook`..
   notebook: {
-      // The ref for the current host
       // On desktop we'll have the one built-in local host that connects to
       // zeromq directly. On jupyterhub backed apps, you'll be able to switch to
       // different hosts.
       selectedHostRef: Ref,
-      hostRefs: List<Ref>,
+      hostRefs: Array<Ref>,
       lastSaved: Date
       
       // TODO: language information? Does this belong at the notebook level?
@@ -89,7 +91,6 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
     hosts: {
       byRef: {
         [ref: Ref]: {
-          ref: Ref,
           loading: boolean,
           error: ?Object
         }
@@ -98,16 +99,14 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
     kernels: {
       byRef: {
         [ref: Ref]: {
-          ref: Ref,
           loading: boolean,
           error: ?Object
         }
       }
     },
-    kernelSpecs: {
+    kernelspecs: {
       byRef: {
         [ref: Ref]: {
-          ref: Ref,
           loading: boolean,
           error: ?Object
         }
@@ -123,7 +122,6 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
     outputs: {
       byRef: {
         [ref: Ref]: {
-          ref: Ref,
           data: Object,
           metadata: Object,
           transient: Object,
@@ -131,9 +129,9 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
         }
       },
 
-      // For capturing the display ID mappings
+      // For capturing the display ID mappings (aliases)
       displayIdToOutputRefs: {
-        [id: Id]: List<Ref>
+        [id: Id]: Array<Ref>
       }
     },
 
@@ -141,18 +139,17 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
       byRef: {
         [ref: Ref]: {
           type: "code" | "markdown" | "raw",
-          ref: Ref,
           source: string,
           metadata: Object,
 
           // NOTE: the following fields are only on code cells
-          outputRefs: List<Ref>,
+          outputRefs: Array<Ref>,
           executionState: "finished" | "executing" | "queued" | "dirty",
           executionCount: ?number,
           lastExecuteMessage: JupyterMessage
         }
       },
-      refs: List<Ref>
+      refs: Array<Ref>
     },
     
     hostSpec: {
@@ -166,15 +163,17 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
 
 
     // Each host implementation has a set of kernels which may be activated.
-    kernelSpecs: {
+    kernelspecs: {
       byRef: {
         [ref: Ref]: {
           name: string,
-          ref: Ref,
-          hostRef: Ref, // TODO: explain why kernelSpecs needs a reference to
-                        // its host?
-          resources: Object, // TODO: What was this?
-          spec: Object, // TODO: Type me!
+          resources: Object,
+          spec: {
+            displayName: string,
+            language: string,
+            argv: Array<string>,
+            env: Object
+          }
         }
       }
     },
@@ -182,20 +181,19 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
     hosts: {
       byRef: {
         [ref: Ref]: {
-          id: Id,
-          ref: Ref,
-          type: "local"|"jupyter",
+          id: string,
+          type: ("local" | "jupyter"),
           selectedKernelRef: Ref,
-	      kernelRefs: List<Ref>,
-          kernelSpecsRef: Ref,
+          kernelRefs: Array<Ref>,
+          kernelspecsRef: Ref,
           defaultKernelName: string,
           token: string,
           serverUrl: string,
           crossDomain: boolean,
-          messages: List<string> // binder only
+          messages: Array<string> // binder only
         }
       }
-      refs: List<Ref>
+      refs: Array<Ref>
     },
 
     // A host may have one active kernel (but we allow multiple to allow smooth
@@ -203,17 +201,12 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
     kernels: {
       byRef: {
         [ref: Ref]: {
-          ref: Ref,
-          type: "local" | "jupyter", // same as server, unchanging
-          hostRef: Ref,  // TODO: explain why kernelSpecs needs a reference to
-                         // its host?
+          type: ("local" | "jupyter"), // same as server, unchanging
           name: string,
           lastActivity: Date,
           channels: rxjs$Subject,
           status: string,
-
           id: Id, // jupyter only
-
           spawn: ChildProcess, // local only
           connectionFile: string, // local only
         }
@@ -225,7 +218,7 @@ and `cellOrder` (list of cell ids). We're taking it to the next level here.
           message: string,
           // TODO: Figure out our structure here
         },
-      refs: List<Ref>
+      refs: Array<Ref>
       }
     }
   }
