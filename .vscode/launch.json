@@ -14,7 +14,11 @@
                 "-r", "babel-register"
             ],
             "program": "${workspaceFolder}/applications/desktop/src/main/index.js",
-            "protocol": "inspector"
+            "protocol": "inspector",
+            "env": {
+                "DEBUG": "true",
+                "NODE_ENV": "development"
+            }
         }
     ]
 }

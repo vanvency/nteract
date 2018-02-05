@@ -1,7 +1,6 @@
 /* @flow */
 import { createStore, applyMiddleware, compose } from "redux";
 import { electronEnhancer } from "redux-electron-store";
-
 import reducers from "./reducers";
 
 const middlewares = [];

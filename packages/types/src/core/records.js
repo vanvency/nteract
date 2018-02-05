@@ -196,6 +196,20 @@ export const makeDocumentRecord: RecordFactory<DocumentRecordProps> = Record({
 });
 export type DocumentRecord = RecordOf<DocumentRecordProps>;
 
+type MultiDocumentRecordProps = {
+  docs: Map<string, DocumentRecordProps>,
+  docFocused: string
+};
+
+export const makeMultiDocumentRecord: RecordFactory<
+  MultiDocumentRecordProps
+> = Record({
+  docs: new Map({ t1: makeDocumentRecord() }),
+  docFocused: "t1"
+});
+
+export type MultiDocumentRecord = RecordOf<MultiDocumentRecordProps>;
+
 type CommsRecordProps = {
   targets: Map<any, any>,
   info: Map<any, any>,

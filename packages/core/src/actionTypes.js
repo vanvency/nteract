@@ -24,6 +24,8 @@ import type { ExecuteRequest } from "@nteract/types/messaging";
 
 import type { Output, StreamOutput } from "@nteract/commutable/src/v4";
 
+export type TargetAction<T> = { target_id: string, target_action: T };
+
 export const CHANGE_FILENAME = "CHANGE_FILENAME";
 export type ChangeFilenameAction = {
   type: "CHANGE_FILENAME",

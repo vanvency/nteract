@@ -10,6 +10,7 @@ import * as actionTypes from "../actionTypes";
 // TODO: With the new document plan, I think it starts to make sense to decouple
 //       the document view actions and the underlying document format
 import type {
+  TargetAction,
   PasteCellAction,
   ChangeFilenameAction,
   ToggleCellExpansionAction,
@@ -52,7 +53,10 @@ import type {
   DocumentRecord
 } from "@nteract/types/core/records";
 
-import { makeDocumentRecord } from "@nteract/types/core/records";
+import {
+  makeDocumentRecord,
+  makeMultiDocumentRecord
+} from "@nteract/types/core/records";
 
 import {
   emptyCodeCell,
@@ -705,6 +709,34 @@ type DocumentAction =
   | SendExecuteMessageAction
   | SetInCellAction<*>;
 
+const defaultMultiDocument: MultiDocumentRecord = makeMultiDocumentRecord();
+
+function handleMultiDocument(
+  state: MultiDocumentRecord = defaultMultiDocument,
+  action: DocumentAction
+) {
+  if (state.get("docs")) {
+    if (action.type) {
+      console.log("orgin handler", action);
+      const docFocused = state.get("docFocused");
+      return state.setIn(
+        ["docs", docFocused],
+        handleDocument(state.getIn(["docs", docFocused]), action)
+      );
+    } else {
+      console.log("new handler", action);
+      const { target_id, target_action } = action;
+      return state.setIn(
+        ["docs", target_id],
+        handleDocument(state.getIn(["docs", target_id]), target_action)
+      );
+    }
+  } else {
+    console.log("ignore action", action);
+    return state;
+  }
+}
+
 const defaultDocument: DocumentRecord = makeDocumentRecord();
 
 function handleDocument(
@@ -786,4 +818,4 @@ function handleDocument(
   }
 }
 
-export default handleDocument;
+export default handleMultiDocument;

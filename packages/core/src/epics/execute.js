@@ -184,7 +184,9 @@ export function executeCellEpic(action$: ActionsObservable<*>, store: any) {
     mergeMap(action => {
       if (action.type === EXECUTE_FOCUSED_CELL) {
         const state = store.getState();
-        const id = state.document.get("cellFocused");
+        const id = state.document
+          .getIn(["docs", state.document.get("docFocused")])
+          .get("cellFocused");
         if (!id) {
           throw new Error("attempted to execute without an id");
         }
@@ -207,10 +209,9 @@ export function executeCellEpic(action$: ActionsObservable<*>, store: any) {
         switchMap(({ id }) => {
           const state = store.getState();
 
-          const cell = state.document.getIn(
-            ["notebook", "cellMap", id],
-            Immutable.Map()
-          );
+          const cell = state.document
+            .getIn(["docs", state.document.get("docFocused")])
+            .getIn(["notebook", "cellMap", id], Immutable.Map());
 
           // We only execute code cells
           if (cell.get("cell_type") !== "code") {

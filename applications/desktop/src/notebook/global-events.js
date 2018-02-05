@@ -21,8 +21,12 @@ export function unload(store: Store<AppState, Action>) {
 export function beforeUnload(store: Store<AppState, Action>, e: any) {
   const state = store.getState();
   const saved = is(
-    state.document.get("notebook"),
-    state.document.get("savedNotebook")
+    state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .get("notebook"), //TODO:hfan
+    state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .get("savedNotebook")
   );
   if (!saved) {
     // Will prevent closing "will-prevent-unload"

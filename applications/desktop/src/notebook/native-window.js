@@ -62,8 +62,12 @@ export function createTitleFeed(state$) {
       state =>
         process.platform === "darwin"
           ? !is(
-              state.document.get("savedNotebook"),
-              state.document.get("notebook")
+              state.document
+                .getIn(["docs", state.document.get("docFocused")])
+                .get("savedNotebook"), //TODO:hfan
+              state.document
+                .getIn(["docs", state.document.get("docFocused")])
+                .get("notebook")
             )
           : false
     ),
@@ -71,7 +75,12 @@ export function createTitleFeed(state$) {
   );
 
   const fullpath$ = state$.pipe(
-    map(state => state.document.get("filename") || "Untitled")
+    map(
+      state =>
+        state.document
+          .getIn(["docs", state.document.get("docFocused")])
+          .get("filename") || "Untitled"
+    ) //TODO:hfan
   );
 
   const kernelStatus$ = state$.pipe(

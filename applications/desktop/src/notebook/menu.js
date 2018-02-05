@@ -35,7 +35,9 @@ import { defaultPathFallback, cwdKernelFallback } from "./path";
 
 export function dispatchSaveAs(store, evt, filename) {
   const state = store.getState();
-  const notebook = state.document.get("notebook");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
   store.dispatch(saveAs(filename, notebook));
 }
 
@@ -68,7 +70,9 @@ export function triggerWindowRefresh(store, filename) {
     return;
   }
   const state = store.getState();
-  const notebook = state.document.get("notebook");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
   store.dispatch(saveAs(filename, notebook));
 }
 
@@ -79,7 +83,13 @@ export function dispatchRestartKernel(store) {
   const notificationSystem = state.app.notificationSystem;
 
   let cwd = cwdKernelFallback();
-  if (state && state.document && state.document.get("filename")) {
+  if (
+    state &&
+    state.document &&
+    state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .get("filename")
+  ) {
     cwd = path.dirname(path.resolve(state.document.filename));
   }
 
@@ -146,8 +156,12 @@ export function triggerSaveAs(store) {
 
 export function dispatchSave(store) {
   const state = store.getState();
-  const notebook = state.document.get("notebook");
-  const filename = state.document.get("filename");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
+  const filename = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("filename");
   if (!filename) {
     triggerSaveAs(store);
   } else {
@@ -158,8 +172,20 @@ export function dispatchSave(store) {
 export function dispatchNewKernel(store, evt, spec) {
   const state = store.getState();
   let cwd = cwdKernelFallback();
-  if (state && state.document && state.document.get("filename")) {
-    cwd = path.dirname(path.resolve(state.document.get("filename")));
+  if (
+    state &&
+    state.document &&
+    state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .get("filename")
+  ) {
+    cwd = path.dirname(
+      path.resolve(
+        state.document
+          .getIn(["docs", state.document.get("docFocused")])
+          .get("filename")
+      )
+    );
   }
   store.dispatch(launchKernel(spec, cwd));
 }
@@ -185,8 +211,12 @@ export function dispatchPublishUserGist(store, event, githubToken) {
  */
 export function dispatchRunAllBelow(store) {
   const state = store.getState();
-  const focusedCellId = state.document.get("cellFocused");
-  const notebook = state.document.get("notebook");
+  const focusedCellId = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("cellFocused");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
   const indexOfFocusedCell = notebook.get("cellOrder").indexOf(focusedCellId);
   const cellsBelowFocusedId = notebook
     .get("cellOrder")
@@ -202,7 +232,9 @@ export function dispatchRunAllBelow(store) {
 
 export function dispatchRunAll(store) {
   const state = store.getState();
-  const notebook = state.document.get("notebook");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
   const cells = notebook.get("cellMap");
   notebook
     .get("cellOrder")
@@ -214,13 +246,17 @@ export function dispatchRunAll(store) {
 
 export function dispatchClearAll(store) {
   const state = store.getState();
-  const notebook = state.document.get("notebook");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
   notebook.get("cellOrder").map(value => store.dispatch(clearOutputs(value)));
 }
 
 export function dispatchUnhideAll(store) {
   const state = store.getState();
-  const notebook = state.document.get("notebook");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
   const cells = notebook.get("cellMap");
   notebook
     .get("cellOrder")
@@ -273,13 +309,17 @@ export function dispatchSetCursorBlink(store, evt, value) {
 
 export function dispatchCopyCell(store) {
   const state = store.getState();
-  const focused = state.document.get("cellFocused");
+  const focused = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("cellFocused");
   store.dispatch(copyCell(focused));
 }
 
 export function dispatchCutCell(store) {
   const state = store.getState();
-  const focused = state.document.get("cellFocused");
+  const focused = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("cellFocused");
   store.dispatch(cutCell(focused));
 }
 
@@ -289,13 +329,17 @@ export function dispatchPasteCell(store) {
 
 export function dispatchCreateCellAfter(store) {
   const state = store.getState();
-  const focused = state.document.get("cellFocused");
+  const focused = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("cellFocused");
   store.dispatch(createCellAfter("code", focused));
 }
 
 export function dispatchCreateTextCellAfter(store) {
   const state = store.getState();
-  const focused = state.document.get("cellFocused");
+  const focused = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("cellFocused");
   store.dispatch(createCellAfter("markdown", focused));
 }
 
@@ -321,7 +365,9 @@ export function exportPDF(
   notificationSystem
 ): void {
   const state = store.getState();
-  const notebook = state.document.get("notebook");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
   const cellMap = notebook.get("cellMap");
   const cellOrder = notebook.get("cellOrder");
   const unexpandedCells = cellOrder.filter(
@@ -378,7 +424,12 @@ export function triggerSaveAsPDF(store) {
 
 export function storeToPDF(store) {
   const state = store.getState();
-  let filename = path.basename(state.document.get("filename"), ".ipynb");
+  let filename = path.basename(
+    state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .get("filename"),
+    ".ipynb"
+  );
   const notificationSystem = state.app.get("notificationSystem");
   if (filename === "") {
     notificationSystem.addNotification({
@@ -399,7 +450,11 @@ export function storeToPDF(store) {
     });
   } else {
     filename = path.join(
-      path.dirname(state.document.get("filename")),
+      path.dirname(
+        state.document
+          .getIn(["docs", state.document.get("docFocused")])
+          .get("filename")
+      ),
       filename
     );
     exportPDF(store, filename, notificationSystem);

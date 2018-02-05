@@ -74,7 +74,9 @@ type AnyCellProps = {
 
 const mapStateToCellProps = (state: Object, ownProps: *): AnyCellProps => {
   const id = ownProps.id;
-  const cell = state.document.getIn(["notebook", "cellMap", id]);
+  const cell = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .getIn(["notebook", "cellMap", id]);
 
   if (!cell) {
     throw new Error("cell not found inside cell map");
@@ -104,13 +106,23 @@ const mapStateToCellProps = (state: Object, ownProps: *): AnyCellProps => {
     executionCount: cell.get("execution_count"),
     outputs,
     models: state.comms.get("models"),
-    pager: state.document.getIn(["cellPagers", id], ImmutableList()),
-    cellFocused: state.document.get("cellFocused") === id,
-    editorFocused: state.document.get("editorFocused") === id,
+    pager: state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .getIn(["cellPagers", id], ImmutableList()),
+    cellFocused:
+      state.document
+        .getIn(["docs", state.document.get("docFocused")])
+        .get("cellFocused") === id,
+    editorFocused:
+      state.document
+        .getIn(["docs", state.document.get("docFocused")])
+        .get("editorFocused") === id,
     sourceHidden,
     outputHidden,
     outputExpanded,
-    cellStatus: state.document.getIn(["transient", "cellMap", id, "status"])
+    cellStatus: state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .getIn(["transient", "cellMap", id, "status"])
   };
 };
 
@@ -320,19 +332,24 @@ const mapStateToProps = (
   ownProps: NotebookProps
 ): NotebookProps => {
   const codeMirrorMode = getCodeMirrorMode(
-    state.document.getIn(["notebook", "metadata"], ImmutableMap())
+    state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .getIn(["notebook", "metadata"], ImmutableMap())
   );
 
   return {
     theme: state.config.get("theme"),
     lastSaved: state.app.get("lastSaved"),
-    cellOrder: state.document.getIn(["notebook", "cellOrder"], ImmutableList()),
-    stickyCells: state.document.get("stickyCells"),
+    cellOrder: state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .getIn(["notebook", "cellOrder"], ImmutableList()),
+    stickyCells: state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .get("stickyCells"),
     kernelStatus: state.app.getIn(["kernel", "status"], "not connected"),
-    languageDisplayName: state.document.getIn(
-      ["notebook", "metadata", "kernelspec", "display_name"],
-      ""
-    ),
+    languageDisplayName: state.document
+      .getIn(["docs", state.document.get("docFocused")])
+      .getIn(["notebook", "metadata", "kernelspec", "display_name"], ""),
     transforms: ownProps.transforms || transforms,
     displayOrder: ownProps.displayOrder || displayOrder,
     codeMirrorMode

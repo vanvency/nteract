@@ -26,6 +26,7 @@ import type {
 import type { Output, StreamOutput } from "@nteract/commutable/src/v4";
 
 import type {
+  TargetAction,
   ExecuteCellAction,
   ExecuteFocusedCellAction,
   PasteCellAction,
@@ -81,6 +82,12 @@ import type {
 } from "../actionTypes";
 
 import { createExecuteRequest } from "@nteract/messaging";
+
+function buildTargetAction(target_id: string, action: any): TargetAction<any> {
+  {
+    target_id, action;
+  }
+}
 
 export function launchKernelSuccessful(
   kernel: LocalKernelProps | RemoteKernelProps

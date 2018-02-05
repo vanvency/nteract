@@ -161,8 +161,12 @@ export function handleGistError(err: Error) {
 export function handleGistAction(store: any, action: any) {
   const github = new Github();
   const state = store.getState();
-  const notebook = state.document.get("notebook");
-  const filename = state.document.get("filename");
+  const notebook = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("notebook");
+  const filename = state.document
+    .getIn(["docs", state.document.get("docFocused")])
+    .get("filename");
   const notificationSystem = state.app.get("notificationSystem");
   let publishAsUser = false;
   if (action.type === PUBLISH_USER_GIST) {

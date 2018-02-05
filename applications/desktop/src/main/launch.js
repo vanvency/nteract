@@ -39,7 +39,7 @@ export function launch(filename) {
   win.once("ready-to-show", () => {
     win.show();
   });
-  const index = path.join(__dirname, "..", "static", "index.html");
+  const index = path.join(__dirname, "..", "..", "static", "index.html");
   win.loadURL(`file://${index}`);
 
   win.webContents.on("will-prevent-unload", e => {

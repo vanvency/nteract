@@ -70,7 +70,15 @@ ipc.on("open-notebook", (event, filename) => {
   launch(resolve(filename));
 });
 
-app.on("ready", initAutoUpdater);
+function onReady() {
+  if (process.env.DEBUG === "true") {
+    BrowserWindow.addDevToolsExtension("D:/soft/crx/2.5.2_0");
+    BrowserWindow.addDevToolsExtension("D:/soft/crx/2.15.1_0");
+  }
+  initAutoUpdater();
+}
+
+app.on("ready", onReady);
 
 const electronReady$ = fromEvent(app, "ready");
 const windowReady$ = fromEvent(ipc, "react-ready");
@@ -132,7 +140,7 @@ export function createSplashSubscriber() {
         show: false
       });
 
-      const index = join(__dirname, "..", "static", "splash.html");
+      const index = join(__dirname, "..", "..", "static", "splash.html");
       win.loadURL(`file://${index}`);
       win.once("ready-to-show", () => {
         win.show();

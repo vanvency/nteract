@@ -36,7 +36,7 @@ const mainConfig = {
 
 const rendererConfig = {
   entry: {
-    app: "./src/notebook/index.js",
+    app: "./src/custom/index.js",
     vendor: [
       "react",
       "react-dnd",

@@ -23,7 +23,7 @@ import { initGlobalHandlers } from "./global-events";
 
 import {
   makeAppRecord,
-  makeDocumentRecord,
+  makeMultiDocumentRecord,
   CommsRecord
 } from "@nteract/types/core/records";
 
@@ -31,7 +31,7 @@ import "./main.css";
 
 const store = configureStore({
   app: makeAppRecord(),
-  document: makeDocumentRecord(),
+  document: makeMultiDocumentRecord(),
   comms: CommsRecord(),
   config: ImmutableMap({
     theme: "light"
@@ -39,13 +39,14 @@ const store = configureStore({
 });
 
 // Register for debugging
-window.store = store;
+// window.store = store;
 
 initNativeHandlers(store);
 initMenuHandlers(store);
 initGlobalHandlers(store);
+console.log("store created", store);
 
-export default class App extends React.PureComponent<Object, Object> {
+export class App extends React.PureComponent<Object, Object> {
   notificationSystem: NotificationSystem;
 
   componentDidMount(): void {
@@ -100,9 +101,9 @@ export default class App extends React.PureComponent<Object, Object> {
   }
 }
 
-const app = document.querySelector("#app");
-if (app) {
-  ReactDOM.render(<App />, app);
-} else {
-  console.error("Failed to bootstrap the notebook app");
-}
+// const app = document.querySelector("#app");
+// if (app) {
+//   ReactDOM.render(<App />, app);
+// } else {
+//   console.error("Failed to bootstrap the notebook app");
+// }
